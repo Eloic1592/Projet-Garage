@@ -1,21 +1,3 @@
-Create database garage;
-Create role garage;
-Alter role garage login password 'garage';
-Alter database garage owner to garage;
-
-\c garage garage
-garage
-
--- Supprimer toutes les tables
-DO $$ DECLARE
-    r RECORD;
-BEGIN
-    FOR r IN (SELECT tablename FROM pg_tables WHERE schemaname = current_schema()) LOOP
-        EXECUTE 'DROP TABLE IF EXISTS ' || quote_ident(r.tablename) || ' CASCADE';
-    END LOOP;
-END $$;
-
--- 1
 Create table Garagiste(
     idgaragiste serial primary key not null,
     email varchar(70) not null,
@@ -50,13 +32,13 @@ Create table Specialite(
 );
 
 -- Exemple
-insert into specialite(nomspecialite,salaire_par_heure) values('vidangeur',500000);
-insert into specialite(nomspecialite,salaire_par_heure) values('nettoyeur',350000);
-insert into specialite(nomspecialite,salaire_par_heure) values('pneu',1230000);
-insert into specialite(nomspecialite,salaire_par_heure) values('controleur',1230000);
-insert into specialite(nomspecialite,salaire_par_heure) values('moteur',1230000);
-insert into specialite(nomspecialite,salaire_par_heure) values('depanneur',1230000);
-insert into specialite(nomspecialite,salaire_par_heure) values('remorqueur',1230000);
+insert into specialite(nomspecialite,salaire_par_heure) values('vidangeur',50000);
+insert into specialite(nomspecialite,salaire_par_heure) values('nettoyeur',35000);
+insert into specialite(nomspecialite,salaire_par_heure) values('pneu',45000);
+insert into specialite(nomspecialite,salaire_par_heure) values('controleur',75000);
+insert into specialite(nomspecialite,salaire_par_heure) values('moteur',70000);
+insert into specialite(nomspecialite,salaire_par_heure) values('depanneur',65000);
+insert into specialite(nomspecialite,salaire_par_heure) values('remorqueur',80000);
 
 
 -- 5
@@ -112,10 +94,10 @@ create table modele(
 );
 
 -- Modele 4(2 modeles par marque)
-insert into modele(modele) values('Ranger',1);
-insert into modele(modele) values('Fiesta',1);
-insert into modele(modele) values('V8',2);
-insert into modele(modele) values('Fortuner',2);
+insert into modele(modele,idmarque) values('Ranger',1);
+insert into modele(modele,idmarque) values('Fiesta',1);
+insert into modele(modele,idmarque) values('V8',2);
+insert into modele(modele,idmarque) values('Fortuner',2);
 
 -- 11
 -- Type de vehicule
@@ -153,6 +135,7 @@ Create table Modele_piece (
 Create table Type_Service(
     idtypeservice serial primary key not null,
     type_service varchar(50) not null
+    -- serviceprix float not null
 );
 
 INSERT INTO Type_Service(type_service) values('vidange');
@@ -167,8 +150,7 @@ Create table Service_specialite(
 
 );
 --Exemple
--- INSERT INTO  Service_specialite(idtypeservice,idspecialite,dureetravail) VALUES(1,1,2);
-INSERT INTO  Service_specialite(idtypeservice,idspecialite,dureetravail) VALUES(1,1,3);
+INSERT INTO  Service_specialite(idtypeservice,idspecialite,dureetravail) VALUES(1,1,2);
 INSERT INTO  Service_specialite(idtypeservice,idspecialite,dureetravail) VALUES(2,2,0.5);
 
 
@@ -201,11 +183,10 @@ Create table Depense(
 -- 19
 Create table service_client(
     idserviceclient serial not null primary key,
-    idvehicule int not null references Vehicule(idvehicule),
+    idvehiculeclient int not null references vehicule_client(idvehiculeclient),
     idclient int not null references Client(idclient),
     idtypeservice int   not null references Type_Service(idtypeservice),
     libelle TEXT not null,
-    -- prix float not null,
     dateservice date
 );
 
@@ -230,6 +211,28 @@ Create table demandedevis(
     datedevis date default now()
 );
 
+-- Produit
+-- 22
+Create table Produit(
+    idProduit serial not null primary key,
+    nomproduit varchar(60),
+    prix float not null
+);
+
+insert into Produit(nomproduit,prix) values('menaka',50000);
+insert into Produit(nomproduit,prix) values('savon',12000);
+insert into Produit(nomproduit,prix) values('eponge',3500);
+
+-- 23
+Create table Service_produit(
+    idtypeservice int not null references Type_Service(idtypeservice),
+    idProduit int not null references Produit(idProduit),
+    quantite float not null
+);
+INSERT INTO Service_produit (idtypeservice,idProduit,quantite) VALUES(1,1,1);
+INSERT INTO Service_produit (idtypeservice,idProduit,quantite) VALUES(2,2,1);
+INSERT INTO Service_produit (idtypeservice,idProduit,quantite) VALUES(2,3,1);
+
 -- View
 -- Liste employe
 create or replace view liste_employe as
@@ -253,6 +256,19 @@ select * from liste_vehicule;
 -- liste_client
 select Client.idclient, Client.nom, Client.prenom, Client.contact
 from Client;
+
+-- devis_service
+create or replace view devis_service as
+select sc.idclient,tp.type_service,spc.nomspecialite,sp.dureetravail,spc.salaire_par_heure,(spc.salaire_par_heure*sp.dureetravail) as prix_salariale from type_service tp 
+join Service_specialite sp using(idtypeservice) 
+join specialite spc using(idspecialite)
+join service_client sc using(idtypeservice);
+
+-- devis produit
+Create or replace view devis_produit as
+select p.idproduit,p.nomproduit,p.prix,s_p.quantite,tp.idtypeservice,tp.type_service,(p.prix*s_p.quantite) as prix_total_produit from produit p 
+join Service_produit s_p using(idproduit) 
+join type_service tp  using(idtypeservice);
 
 
 
