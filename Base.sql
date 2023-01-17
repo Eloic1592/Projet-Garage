@@ -231,6 +231,7 @@ Create table demandedevis(
 );
 
 -- View
+-- Liste employe
 create or replace view liste_employe as
 select idemploye, Employe.nom, Employe.prenom, genre.nom as genre , specialite.nomspecialite 
 from Employe 
@@ -239,6 +240,7 @@ join specialite on (Employe.idspecialite=specialite.idspecialite);
 
 select * from liste_employe;
 
+-- Liste vehicule
 create or replace view liste_vehicule as
 select vc.idclient,c.nom,c.prenom,vc.immatriculation,mq.marque,m.modele from vehicule_client vc 
 join modele m on vc.idmodele=m.id 
@@ -246,8 +248,11 @@ join marque mq on mq.id=m.idmarque
 join vehicule v using(idvehicule) 
 join client c using(idclient);
 
-
 select * from liste_vehicule;
+
+-- liste_client
+select Client.idclient, Client.nom, Client.prenom, Client.contact
+from Client;
 
 
 
