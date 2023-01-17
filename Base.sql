@@ -259,7 +259,7 @@ from Client;
 
 -- devis_service
 create or replace view devis_service as
-select sc.idclient,tp.type_service,spc.nomspecialite,sp.dureetravail,spc.salaire_par_heure,(spc.salaire_par_heure*sp.dureetravail) as prix_salariale from type_service tp 
+select sc.idclient,tp.idtypeservice,tp.type_service,spc.nomspecialite,sp.dureetravail,spc.salaire_par_heure,(spc.salaire_par_heure*sp.dureetravail) as prix_salariale from type_service tp 
 join Service_specialite sp using(idtypeservice) 
 join specialite spc using(idspecialite)
 join service_client sc using(idtypeservice);
@@ -270,5 +270,11 @@ select p.idproduit,p.nomproduit,p.prix,s_p.quantite,tp.idtypeservice,tp.type_ser
 join Service_produit s_p using(idproduit) 
 join type_service tp  using(idtypeservice);
 
+
+-- Somme total du salaire_par_heure de chaque specialites utilisees pour effectuer le x service
+select sum(ds.prix_total_produit) from devis_produit ds where idtypeservice=1;
+
+-- Somme total du prix des produits utilisees pour effectuer le x service
+select sum(ds.prix_total_produit) from devis_produit ds where idtypeservice=2;
 
 
