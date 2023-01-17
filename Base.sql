@@ -237,7 +237,17 @@ from Employe
 join genre on (Employe.idgenre=genre.idgenre) 
 join specialite on (Employe.idspecialite=specialite.idspecialite);
 
+select * from liste_employe;
 
+create or replace view liste_vehicule as
+select vc.idclient,c.nom,c.prenom,vc.immatriculation,mq.marque,m.modele from vehicule_client vc 
+join modele m on vc.idmodele=m.id 
+join marque mq on mq.id=m.idmarque 
+join vehicule v using(idvehicule) 
+join client c using(idclient);
+
+
+select * from liste_vehicule;
 
 
 
