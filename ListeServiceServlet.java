@@ -6,25 +6,22 @@
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Vector;
+import javax.servlet.RequestDispatcher;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import connection.PostgresConnection;
-import javax.servlet.RequestDispatcher;
-import model.Type_service;
-import model.Vehicule_client;
+import model.Service;
 
 /**
  *
  * @author Mialisoa
  */
-public class ServeServiceServlet extends HttpServlet {
+public class ListeServiceServlet extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -38,32 +35,19 @@ public class ServeServiceServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        RequestDispatcher dispatcher = request.getRequestDispatcher("Service.jsp");
+        
+        RequestDispatcher dispatcher = request.getRequestDispatcher("liste-service.jsp");
         try {
-            Connection connection = PostgresConnection.getConnection();
-            Vector<Type_service> services = new Type_service().getAll(connection);
-            Integer client = Integer.parseInt(request.getParameter("client"));
-            Vehicule_client serviceVehicule = new Vehicule_client();
-            serviceVehicule.setIdclient(client);
-            String[] colonnes = new String[1];
-            colonnes[0] = "idclient";
-            Vector<Vehicule_client> vehicules = serviceVehicule.getBy(connection, colonnes);
-            connection.close();
-
-            
-            request.setAttribute("vehicules", vehicules);
+            Vector<Service> services = new Service().getAll(null);
             request.setAttribute("services", services);
-            request.setAttribute("client", client);
-        } catch (SQLException e) {
-            Integer sqlError = 1;
-            request.setAttribute("sqlError", sqlError);
-        } catch (Exception e1) {
-            Integer error = 1;
-            request.setAttribute("error", error);
-        }
-        finally {
+        } catch (SQLException ex) {
+            request.setAttribute("sqlError", 1);
+        } catch (Exception ex) {
+            request.setAttribute("error", 1);
+        } finally {
             dispatcher.forward(request, response);
         }
+        
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

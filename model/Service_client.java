@@ -5,8 +5,15 @@
  */
 package model;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import connection.PostgresConnection;
 
 /**
  *
@@ -37,6 +44,28 @@ public class Service_client extends Model{
         this.setLibelle(libelle);
         setDateservice(dateservice);
         this.setNbrField(6);
+    }
+
+    public int insertReturningId(Connection connection) throws ClassNotFoundException, SQLException {
+        boolean isOpen = false;
+        if (connection == null) {
+            connection = PostgresConnection.getConnection();
+            isOpen = true;
+        }
+
+        // Statement statement = connection.createStatement();
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        String req = "insert into service_client values(default, " + this.getIdvehiculeclient() + ", "+  this.getIdclient() + ", " + this.getIdtypeservice() + ", '" + this.getLibelle() + "', '" + format.format(this.getDateservice()) + "') returning idtypeservice";
+        Statement statement = connection.createStatement();
+        ResultSet res = statement.executeQuery(req);
+        connection.commit();
+
+        int id = 0;
+        if(res.next()) {
+            id = res.getInt(1);
+        }
+        
+        return id;
     }
 
     public Service_client() {

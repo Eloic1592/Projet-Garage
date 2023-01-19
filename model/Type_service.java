@@ -12,15 +12,19 @@ package model;
 public class Type_service extends Model {
     int idtypeservice;
     String type_service;
+    float marge_beneficiaire;
 
-    public Type_service(int idtypeservice, String type_service) {
+    
+
+    public Type_service(int idtypeservice, String type_service, float marge_beneficiaire) {
         this.idtypeservice = idtypeservice;
         this.type_service = type_service;
-        this.setNbrField(2);
+        setMarge_beneficiaire(marge_beneficiaire);
+        this.setNbrField(3);
     }
 
     public Type_service() {
-        this.setNbrField(2);
+        this.setNbrField(3);
     }
 
     public int getIdtypeservice() {
@@ -37,5 +41,13 @@ public class Type_service extends Model {
 
     public void setType_service(String type_service) {
         this.type_service = type_service;
+    }
+
+    public float getMarge_beneficiaire() {
+        return marge_beneficiaire;
+    }
+
+    public void setMarge_beneficiaire(float marge_beneficiaire) {
+        this.marge_beneficiaire = marge_beneficiaire;
     }
 }

@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.Vector;
 
 import javax.servlet.RequestDispatcher;
 
@@ -17,7 +18,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import model.Devis_produit;
+import model.Devis_service;
 import model.Service_client;
+import model.Total_devis_produit;
+import model.Total_devis_service;
 
 /**
  *
@@ -59,14 +64,51 @@ public class InsertServiceServlet extends HttpServlet {
         // }        
         // else {
             try {
-                service_client.insertToTable(null, true);
-                dispatcher = request.getRequestDispatcher("ServeDevis");
+                Integer id = service_client.insertReturningId(null);
+                // PrintWriter out = response.getWriter();
+                // out.print(id);
+                request.setAttribute("typeService", id);
+
+                Devis_service devis_service = new Devis_service();
+                devis_service.setIdtypeservice(id);
+                String[] colonnes = new String[1];
+                colonnes[0] = "idtypeservice";
+                Vector<Devis_service> montantsService = devis_service.getBy(null, colonnes);
+
+                Devis_produit devis_produit = new Devis_produit();
+                devis_produit.setIdtypeservice(idTypeService);
+
+                Vector<Devis_produit> montanProduits = devis_produit.getBy(null, colonnes);
+
+                Total_devis_produit totalProduits = new Total_devis_produit();
+                totalProduits.setIdtypeservice(idTypeService);
+
+                Vector<Total_devis_produit> sommeProduit = totalProduits.getBy(null, colonnes);
+
+                Total_devis_service totalService = new Total_devis_service();
+                totalService.setIdtypeservice(idTypeService);
+
+                Vector<Total_devis_service> sommeService = totalService.getBy(null, colonnes);
+
+                request.setAttribute("service", montantsService);
+                request.setAttribute("produit", montanProduits);
+                if(sommeProduit.size() != 0 && sommeService.size() != 0)
+                request.setAttribute("montantService", sommeService.get(0).getSum());
+                request.setAttribute("montantProduit", sommeProduit.get(0).getSum());
+                request.setAttribute("total", sommeProduit.get(0).getSum()+sommeService.get(0).getSum());
+
+                request.setAttribute("benefice", (sommeProduit.get(0).getSum()+sommeService.get(0).getSum())*devis_service.getMarge_beneficiaire());
+
+
+                PrintWriter out = response.getWriter();
+                out.print(id);
+                dispatcher = request.getRequestDispatcher("devis.jsp");
             } catch (SQLException e) {
-                // e.printStackTrace(response.getWriter());
+                e.printStackTrace(response.getWriter());
                 request.setAttribute("sqlError", sqlError);
                 dispatcher = request.getRequestDispatcher("Service.jsp");
             } catch (Exception e1) {
-                // e1.printStackTrace(response.getWriter());
+                e1.printStackTrace(response.getWriter());
                 request.setAttribute("error", error);
                 dispatcher = request.getRequestDispatcher("Service.jsp");
             }
