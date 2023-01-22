@@ -66,7 +66,7 @@ Create table Employe (
     prenom varchar(50) not null,
     datenaissance date not null,
     idgenre int not null references genre(idgenre),
-    idspecialite int not null references specialite(idspecialite),
+    -- idspecialite int not null references specialite(idspecialite),
     idniveauetude int not null references Niveauetude(idniveauetude)
 );
 
@@ -258,10 +258,8 @@ INSERT INTO Service_produit (idtypeservice,idProduit,quantite) VALUES(2,3,1);
 -- View
 -- Liste employe
 create or replace view liste_employe as
-select idemploye, Employe.nom, Employe.prenom, genre.nom as genre , specialite.nomspecialite 
-from Employe 
-join genre on (Employe.idgenre=genre.idgenre) 
-join specialite on (Employe.idspecialite=specialite.idspecialite);
+select idemploye, Employe.nom, Employe.prenom, genre.nom as genre , specialite.nomspecialite from Employe join genre on (Employe.idgenre=genre.idgenre) join specialite on (Employe.idspecialite=specialite.idspecialite);
+
 
 select * from liste_employe;
 
