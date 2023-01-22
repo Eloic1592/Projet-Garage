@@ -66,7 +66,7 @@ Create table Employe (
     prenom varchar(50) not null,
     datenaissance date not null,
     idgenre int not null references genre(idgenre),
-    idspecialite int not null references specialite(idspecialite),
+    -- idspecialite int not null references specialite(idspecialite),
     idniveauetude int not null references Niveauetude(idniveauetude)
 );
 
@@ -158,7 +158,11 @@ Create table Type_Service(
 
 INSERT INTO Type_Service(type_service,marge_beneficiaire) values('vidange',0.2);
 INSERT INTO Type_Service(type_service,marge_beneficiaire) values('nettoyage',0.15);
-
+-- INSERT INTO Type_Service(type_service,marge_beneficiaire) values('gonflage de pneus',0.21);
+-- INSERT INTO Type_Service(type_service,marge_beneficiaire) values('Controle niveau liquide',0.3);
+-- INSERT INTO Type_Service(type_service,marge_beneficiaire) values('Controle moteur',0.1);
+-- INSERT INTO Type_Service(type_service,marge_beneficiaire) values('Reparateur',0.19);
+-- INSERT INTO Type_Service(type_service,marge_beneficiaire) values('routier',0.24);
 
 -- 15
 Create table Service_specialite(
@@ -254,10 +258,8 @@ INSERT INTO Service_produit (idtypeservice,idProduit,quantite) VALUES(2,3,1);
 -- View
 -- Liste employe
 create or replace view liste_employe as
-select idemploye, Employe.nom, Employe.prenom, genre.nom as genre , specialite.nomspecialite 
-from Employe 
-join genre on (Employe.idgenre=genre.idgenre) 
-join specialite on (Employe.idspecialite=specialite.idspecialite);
+select idemploye, Employe.nom, Employe.prenom, genre.nom as genre , specialite.nomspecialite from Employe join genre on (Employe.idgenre=genre.idgenre) join specialite on (Employe.idspecialite=specialite.idspecialite);
+
 
 select * from liste_employe;
 
