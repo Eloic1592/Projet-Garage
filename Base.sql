@@ -294,7 +294,3 @@ join type_service tp  using(idtypeservice);
 -- Somme total du salaire_par_heure de chaque specialites utilisees pour effectuer le x service
 Create or replace view total_devis_service as
 select idtypeservice,sum(ds.prix_salariale) from devis_service ds group by idtypeservice;
-
-
--- Somme total du prix des produits utilisees pour effectuer le x service
-Create or replace view total_devis_produit as
