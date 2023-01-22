@@ -1,3 +1,21 @@
+Create database garage;
+Create role garage;
+Alter role garage login password 'garage';
+Alter database garage owner to garage;
+
+\c garage garage
+garage
+
+-- Supprimer toutes les tables
+DO $$ DECLARE
+    r RECORD;
+BEGIN
+    FOR r IN (SELECT tablename FROM pg_tables WHERE schemaname = current_schema()) LOOP
+        EXECUTE 'DROP TABLE IF EXISTS ' || quote_ident(r.tablename) || ' CASCADE';
+    END LOOP;
+END $$;
+
+-- 1
 Create table Garagiste(
     idgaragiste serial primary key not null,
     email varchar(70) not null,
@@ -134,12 +152,12 @@ Create table Modele_piece (
 -- 14
 Create table Type_Service(
     idtypeservice serial primary key not null,
-    type_service varchar(50) not null
-    -- serviceprix float not null
+    type_service varchar(50) not null,
+    marge_beneficiaire float 
 );
 
-INSERT INTO Type_Service(type_service) values('vidange');
-INSERT INTO Type_Service(type_service) values('nettoyage');
+INSERT INTO Type_Service(type_service,marge_beneficiaire) values('vidange',0.2);
+INSERT INTO Type_Service(type_service,marge_beneficiaire) values('nettoyage',0.15);
 
 
 -- 15
@@ -259,22 +277,37 @@ from Client;
 
 -- devis_service
 create or replace view devis_service as
-select sc.idclient,tp.idtypeservice,tp.type_service,spc.nomspecialite,sp.dureetravail,spc.salaire_par_heure,(spc.salaire_par_heure*sp.dureetravail) as prix_salariale from type_service tp 
+select tp.idtypeservice,tp.type_service,spc.nomspecialite,sp.dureetravail,spc.salaire_par_heure,(spc.salaire_par_heure*sp.dureetravail) as prix_salariale, tp.marge_beneficiaire from type_service tp 
 join Service_specialite sp using(idtypeservice) 
-join specialite spc using(idspecialite)
-join service_client sc using(idtypeservice);
+join specialite spc using(idspecialite);
 
 -- devis produit
 Create or replace view devis_produit as
 select p.idproduit,p.nomproduit,p.prix,s_p.quantite,tp.idtypeservice,tp.type_service,(p.prix*s_p.quantite) as prix_total_produit from produit p 
 join Service_produit s_p using(idproduit) 
-join type_service tp  using(idtypeservice);
+join type_service tp  using(idtypeservice); 
 
 
 -- Somme total du salaire_par_heure de chaque specialites utilisees pour effectuer le x service
-select sum(ds.prix_total_produit) from devis_produit ds where idtypeservice=1;
+Create or replace view total_devis_service as
+select idtypeservice,sum(ds.prix_salariale) from devis_service ds group by idtypeservice;
+
 
 -- Somme total du prix des produits utilisees pour effectuer le x service
-select sum(ds.prix_total_produit) from devis_produit ds where idtypeservice=2;
+Create or replace view total_devis_produit as
+select idtypeservice,sum(ds.prix_total_produit) from devis_produit ds group by idtypeservice;
 
 
+-- Calcul benefice;
+-- Prix de vente d'un service - depenses utilisation de produit;
+
+
+-- select tp.idtypeservice,tp.type_service,spc.nomspecialite,sp.dureetravail,spc.salaire_par_heure,(spc.salaire_par_heure*sp.dureetravail+tp.marge_beneficiaire) as prix_salariale from type_service tp 
+-- join Service_specialite sp using(idtypeservice) 
+-- join specialite spc using(idspecialite)
+-- join service_client sc using(idtypeservice);
+
+create or replace view service as select service.idtypeservice, service.type_service, produit.sum as montant_produit, d_service.sum as montant_service, service.marge_beneficiaire
+from type_service service
+join total_devis_produit produit on service.idtypeservice = produit.idtypeservice 
+join total_devis_service d_service on service.idtypeservice = d_service.idtypeservice;
