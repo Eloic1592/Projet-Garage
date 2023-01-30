@@ -7,20 +7,22 @@
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
-import javax.servlet.RequestDispatcher;
+import java.util.Vector;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import model.Produit;
+import exceptions.AuthException;
+import javax.servlet.http.HttpSession;
+import model.Garagiste;
 
 /**
  *
  * @author Mialisoa
  */
-public class PrixProduitServlet extends HttpServlet {
+public class LoginGaragiste extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -34,43 +36,24 @@ public class PrixProduitServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
+        
+        String email = request.getParameter("email");
+        String mdp = request.getParameter("mdp");
 
-        RequestDispatcher dispatcher = request.getRequestDispatcher("prix-produit.jsp");
+        Garagiste garagiste = new Garagiste(0, email, mdp);
         try {
-                
-            int idProduit = Integer.parseInt(request.getParameter("produit"));
-            Produit produit = new Produit();
-            produit.setIdProduit(idProduit);
-            String[] params = new String[1];
-            params[0] = "idProduit";
-
-            Produit p = ((Produit)produit.getBy(null, params).get(0));
-            produit.setIdProduit(idProduit);
-
-
-            Double prixConseille = produit.getPrixConseille(null);
-            Double marge = produit.getMargeBeneficiaire(null);
-            Double benefice = prixConseille.doubleValue() - Double.parseDouble(String.valueOf(p.getPrix())) ;
-            // PrintWriter out = response.getWriter();
-            // out.print(p.getPrix() + " " + prixConseille);
-
-            request.setAttribute("produit", p);
-            request.setAttribute("prix", prixConseille);
-            request.setAttribute("benefice", benefice);
-            request.setAttribute("marge", marge);
-
+            int id = garagiste.authentification(null);
+            HttpSession session = request.getSession();
+            session.setAttribute("garagiste", id);
+            response.sendRedirect("ListeEmploye");
         } catch (SQLException e) {
-            Integer sqlError = 1;
-            request.setAttribute("sqlError", sqlError);
-        } catch (Exception e1) {
-            Integer error = 1;
-            request.setAttribute("error", error);
-        }
-        finally {
-            dispatcher.forward(request, response);
+            // Erreur de base de donnée
+        } catch (AuthException e) {
+            // login incorrect
+        } catch (Exception e) {
+            // internal servor error
         }
         
-
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

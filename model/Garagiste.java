@@ -5,6 +5,13 @@
  */
 package model;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.Vector;
+
+import connection.PostgresConnection;
+import exceptions.AuthException;
+
 /**
  *
  * @author Mialisoa
@@ -24,6 +31,30 @@ public class Garagiste extends Model {
 
     public Garagiste() {
         this.setNbrField(3);
+    }
+
+    public int authentification(Connection connection) throws ClassNotFoundException, SQLException, AuthException, Exception {
+        boolean isOpen = false;
+        if (connection == null) {
+            connection = PostgresConnection.getConnection();
+            isOpen = true;
+        }
+        
+        String[] params = new String[2];
+        params[0] = "email";
+        params[1] = "mdp";
+
+        Vector<Garagiste> auth = this.getBy(connection, params);
+        if(isOpen == true) {
+            connection.close();
+        }
+        if(auth.size() == 1) {
+            return auth.get(0).getIdgaragiste();
+        }
+        else {
+            throw new AuthException("Identifiants incorrects"); 
+        }
+
     }
 
     public int getIdgaragiste() {

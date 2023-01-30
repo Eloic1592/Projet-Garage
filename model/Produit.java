@@ -53,6 +53,23 @@ public class Produit extends Model {
         return benefice+prixAchat;
     }
 
+    public double getMargeBeneficiaire(Connection connection) throws ClassNotFoundException, SQLException, Exception {
+        String[] params = new String[1];
+        params[0] = "idProduit";
+        Produit produit = ((Produit)this.getBy(connection, params).get(0));
+
+        double prixAchat = produit.getPrix();
+        double marge = 0;
+
+        Vector<Pourcentage> pourcentages = new Pourcentage().getAll(connection);
+        for (Pourcentage pourcentage : pourcentages) {
+            if(prixAchat >= pourcentage.getPrixmin() && prixAchat < pourcentage.getPrixmax())
+            marge = pourcentage.getPourcentage();
+        }
+        
+        return marge*100;
+    }
+
     public Produit() {
         this.setNbrField(3);
     }
