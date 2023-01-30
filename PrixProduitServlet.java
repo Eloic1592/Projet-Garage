@@ -6,24 +6,21 @@
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Vector;
+import javax.servlet.RequestDispatcher;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import connection.PostgresConnection;
-import javax.servlet.RequestDispatcher;
-import model.Revenu_service;
+import model.Produit;
 
 /**
  *
  * @author Mialisoa
  */
-public class ServeDevisServlet extends HttpServlet {
+public class PrixProduitServlet extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -37,13 +34,29 @@ public class ServeDevisServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        RequestDispatcher dispatcher = request.getRequestDispatcher("devis.jsp");
+
+        RequestDispatcher dispatcher = request.getRequestDispatcher("prix-produit.jsp");
         try {
-            Vector<Revenu_service> devis = new Revenu_service().getAll(null);
-            for (Revenu_service revenu_service : devis) {
-                revenu_service.setMarge();
-            }
-            request.setAttribute("devis", devis);
+                
+            int idProduit = Integer.parseInt(request.getParameter("produit"));
+            Produit produit = new Produit();
+            produit.setIdProduit(idProduit);
+            String[] params = new String[1];
+            params[0] = "idProduit";
+
+            Produit p = ((Produit)produit.getBy(null, params).get(0));
+            produit.setIdProduit(idProduit);
+
+
+            Double prixConseille = produit.getPrixConseille(null);
+            Double benefice = prixConseille.doubleValue() - Double.parseDouble(String.valueOf(p.getPrix())) ;
+            // PrintWriter out = response.getWriter();
+            // out.print(p.getPrix() + " " + prixConseille);
+
+            request.setAttribute("produit", p);
+            request.setAttribute("prix", prixConseille);
+            request.setAttribute("benefice", benefice);
+
         } catch (SQLException e) {
             Integer sqlError = 1;
             request.setAttribute("sqlError", sqlError);
@@ -54,6 +67,8 @@ public class ServeDevisServlet extends HttpServlet {
         finally {
             dispatcher.forward(request, response);
         }
+        
+
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

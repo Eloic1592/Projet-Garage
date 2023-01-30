@@ -4,25 +4,24 @@
  * and open the template in the editor.
  */
 
-import exceptions.AgeException;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Vector;
 import javax.servlet.RequestDispatcher;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import connection.PostgresConnection;
-import model.Employe;
+import model.Produit;
 
 /**
  *
  * @author Mialisoa
  */
-public class InsertServlet extends HttpServlet {
+public class ServeProduit extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -36,57 +35,22 @@ public class InsertServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        
-        String nom = request.getParameter("nom");
-        String prenom = request.getParameter("prenom");
-        String date_naissance = request.getParameter("date_naissance");
-        int genre = Integer.parseInt(request.getParameter("genre"));
-        int niveau = Integer.parseInt(request.getParameter("niveau"));
-        
-        PrintWriter out = response.getWriter();
-        Connection connection = null; 
-        RequestDispatcher dispatch;
-        Integer error = 0;
+      
+        RequestDispatcher dispatcher = request.getRequestDispatcher("form-produit.jsp");
         try {
-        // insertion employe
-            connection = PostgresConnection.getConnection();
-            Employe emp = new Employe(0, nom, prenom, date_naissance, genre, niveau);
-
-            Integer id = emp.insert(connection);
-            out.print(id.intValue());
-            connection.commit();
+            Vector<Produit> produits = new Produit().getAll(null);
             
-            
-            request.getSession().setAttribute("id", id);              
-            dispatch = request.getRequestDispatcher("specialite.jsp");
-            dispatch.forward(request, response);
-        }
-        catch (AgeException ageException) {
-            error = 3;                      // trop jeune
-        }
-        catch (Exception e) {
-            e.printStackTrace(response.getWriter());
-            if(connection != null) {
-                error = 1;                  // erreur lié au serveur
-                try {
-                    connection.rollback();
-                }
-                catch (SQLException e1) {
-                    error = 1;              // erreur lié au serveur
-                    // e1.printStackTrace(response.getWriter());
-                    
-                }
-            }
-            else {
-                error = 2;                  // erreur de connexion
-            }
+            request.setAttribute("produits", produits);
+        } catch (SQLException e) {
+            Integer sqlError = 1;
+            request.setAttribute("sqlError", sqlError);
+        } catch (Exception e1) {
+            Integer error = 1;
+            request.setAttribute("error", error);
         }
         finally {
-            request.setAttribute("error", error);
-            dispatch = request.getRequestDispatcher("index.jsp");
-            // dispatch.forward(request, response);
+            dispatcher.forward(request, response);
         }
-        
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
