@@ -5,6 +5,10 @@
  */
 package model;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.Vector;
+
 /**
  *
  * @author Mialisoa
@@ -19,6 +23,34 @@ public class Produit extends Model {
         setNomproduit(nomproduit);
         setPrix(prix);
         this.setNbrField(3);
+    }
+
+    public double getPrixConseille(Connection connection) throws ClassNotFoundException, SQLException, Exception {
+        String[] params = new String[1];
+        params[0] = "idProduit";
+        Produit produit = ((Produit)this.getBy(connection, params).get(0));
+
+        double prixAchat = produit.getPrix();
+        double marge = 0;
+        // if(prixAchat > 0 && prixAchat <=1000) {
+        //     marge = (double)50/100;
+        // }
+        // else if(prixAchat <= 5000) 
+        //     marge = (double)30/100;
+        // else if (prixAchat <= 10000) 
+        //     marge = (double)10/100;
+        // else 
+        //     marge = (double)2/100;
+        
+        
+        Vector<Pourcentage> pourcentages = new Pourcentage().getAll(connection);
+        for (Pourcentage pourcentage : pourcentages) {
+            if(prixAchat >= pourcentage.getPrixmin() && prixAchat < pourcentage.getPrixmax())
+            marge = pourcentage.getPourcentage();
+        }
+        
+        double benefice = prixAchat*marge;
+        return benefice+prixAchat;
     }
 
     public Produit() {
