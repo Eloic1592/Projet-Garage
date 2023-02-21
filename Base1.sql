@@ -50,13 +50,13 @@ Create table Specialite(
 );
 
 -- Exemple
-insert into specialite(nomspecialite,salaire_par_heure) values('vidangeur',50000);
-insert into specialite(nomspecialite,salaire_par_heure) values('nettoyeur',35000);
-insert into specialite(nomspecialite,salaire_par_heure) values('pneu',45000);
-insert into specialite(nomspecialite,salaire_par_heure) values('controleur',75000);
-insert into specialite(nomspecialite,salaire_par_heure) values('moteur',70000);
-insert into specialite(nomspecialite,salaire_par_heure) values('depanneur',65000);
-insert into specialite(nomspecialite,salaire_par_heure) values('remorqueur',80000);
+insert into specialite(nomspecialite,salaire_par_heure) values('vidangeur',500000);
+insert into specialite(nomspecialite,salaire_par_heure) values('nettoyeur',350000);
+insert into specialite(nomspecialite,salaire_par_heure) values('pneu',1230000);
+insert into specialite(nomspecialite,salaire_par_heure) values('controleur',1230000);
+insert into specialite(nomspecialite,salaire_par_heure) values('moteur',1230000);
+insert into specialite(nomspecialite,salaire_par_heure) values('depanneur',1230000);
+insert into specialite(nomspecialite,salaire_par_heure) values('remorqueur',1230000);
 
 
 -- 5
@@ -66,7 +66,7 @@ Create table Employe (
     prenom varchar(50) not null,
     datenaissance date not null,
     idgenre int not null references genre(idgenre),
-    -- idspecialite int not null references specialite(idspecialite),
+    idspecialite int not null references specialite(idspecialite),
     idniveauetude int not null references Niveauetude(idniveauetude)
 );
 
@@ -85,7 +85,8 @@ Create table Client(
     prenom varchar(50) not null,
     email varchar(50) not null,
     contact varchar(50) not null,
-    mdp varchar(50) not null 
+    adresse varchar(50) not null,
+    datenaissance DATE not null
     -- MDP A CORRIGER EN ADRESSE
 );
 
@@ -112,10 +113,10 @@ create table modele(
 );
 
 -- Modele 4(2 modeles par marque)
-insert into modele(modele,idmarque) values('Ranger',1);
-insert into modele(modele,idmarque) values('Fiesta',1);
-insert into modele(modele,idmarque) values('V8',2);
-insert into modele(modele,idmarque) values('Fortuner',2);
+insert into modele(modele) values('Ranger',1);
+insert into modele(modele) values('Fiesta',1);
+insert into modele(modele) values('V8',2);
+insert into modele(modele) values('Fortuner',2);
 
 -- 11
 -- Type de vehicule
@@ -152,17 +153,12 @@ Create table Modele_piece (
 -- 14
 Create table Type_Service(
     idtypeservice serial primary key not null,
-    type_service varchar(50) not null,
-    marge_beneficiaire float 
+    type_service varchar(50) not null
 );
 
-INSERT INTO Type_Service(type_service,marge_beneficiaire) values('vidange',0.2);
-INSERT INTO Type_Service(type_service,marge_beneficiaire) values('nettoyage',0.15);
--- INSERT INTO Type_Service(type_service,marge_beneficiaire) values('gonflage de pneus',0.21);
--- INSERT INTO Type_Service(type_service,marge_beneficiaire) values('Controle niveau liquide',0.3);
--- INSERT INTO Type_Service(type_service,marge_beneficiaire) values('Controle moteur',0.1);
--- INSERT INTO Type_Service(type_service,marge_beneficiaire) values('Reparateur',0.19);
--- INSERT INTO Type_Service(type_service,marge_beneficiaire) values('routier',0.24);
+INSERT INTO Type_Service(type_service) values('vidange');
+INSERT INTO Type_Service(type_service) values('nettoyage');
+
 
 -- 15
 Create table Service_specialite(
@@ -172,17 +168,18 @@ Create table Service_specialite(
 
 );
 --Exemple
-INSERT INTO  Service_specialite(idtypeservice,idspecialite,dureetravail) VALUES(1,1,2);
+-- INSERT INTO  Service_specialite(idtypeservice,idspecialite,dureetravail) VALUES(1,1,2);
+INSERT INTO  Service_specialite(idtypeservice,idspecialite,dureetravail) VALUES(1,1,3);
 INSERT INTO  Service_specialite(idtypeservice,idspecialite,dureetravail) VALUES(2,2,0.5);
 
 
 -- 16 Depense
-Create table Type_depense(
-    idtypedepense serial primary key not null,
-    type_depense varchar(50) not null
-);
-INSERT INTO Type_depense(Type_depense) values('jirama');
-INSERT INTO Type_depense(Type_depense) values('Loyer');
+-- Create table Type_depense(
+--     idtypedepense serial primary key not null,
+--     type_depense varchar(50) not null
+-- );
+-- INSERT INTO Type_depense(Type_depense) values('jirama');
+-- INSERT INTO Type_depense(Type_depense) values('Loyer');
 -- 17
 Create table Achat_piece(
     idmodelepiece int not null references Modele_piece(idmodelepiece),
@@ -195,7 +192,7 @@ Create table Achat_piece(
 -- 18
 Create table Depense(
     iddepense serial primary key not null,
-    idtypedepense int not null references Type_depense(idtypedepense),
+    designation VARCHAR(100),
     prix float not null,
     date date
 );
@@ -203,14 +200,14 @@ Create table Depense(
 
 -- Degat/Gain
 -- 19
-create table service_client(
+Create table service_client(
     idserviceclient serial not null primary key,
-    -- idvehiculeclient int not null references vehicule_client(idvehiculeclient),
+    idvehicule int not null references Vehicule(idvehicule),
     idclient int not null references Client(idclient),
     idtypeservice int   not null references Type_Service(idtypeservice),
-    -- libelle TEXT not null,
-    quantite int,
-    dateservice TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    libelle TEXT not null,
+    -- prix float not null,
+    dateservice date
 );
 
 
@@ -234,8 +231,6 @@ Create table demandedevis(
     datedevis date default now()
 );
 
--- Produit
--- 22
 Create table Produit(
     idProduit serial not null primary key,
     nomproduit varchar(60),
@@ -256,79 +251,112 @@ INSERT INTO Service_produit (idtypeservice,idProduit,quantite) VALUES(1,1,1);
 INSERT INTO Service_produit (idtypeservice,idProduit,quantite) VALUES(2,2,1);
 INSERT INTO Service_produit (idtypeservice,idProduit,quantite) VALUES(2,3,1);
 
+-- Facture_mere
+-- 22
+create table facture_mere(
+    idFactureMere serial  not null primary key,
+    idclient int not null references Client(idclient),
+    dates timestamp,
+    remise double precision+
+);
+
+-- Details_Facture
+-- 23
+create table details_Facture(
+    idDetailsfacture serial  not null primary key,
+    idFactureMere int not null references facture_mere(idFactureMere),
+    idtypeservice int not null references type_service(idtypeservice),
+    prixunitaire double precision,
+    quantite double precision,
+    Montant double precision
+);
+
+-- Paiementfacture
+-- 24
+create table paiementfacture(
+     idFactureMere int not null references facture_mere(idFactureMere),
+     idclient int not null references Client(idclient),
+     montant double precision
+);
+
+-- 24
+Create table report(
+    idreport serial not null primary key,
+    montant double precision,
+    datereport date
+);
+
+
 -- View
--- Liste employe
+
+-- liste_employe
 create or replace view liste_employe as
-select idemploye, Employe.nom, Employe.prenom, genre.nom as genre , specialite.nomspecialite from Employe join genre on (Employe.idgenre=genre.idgenre) join specialite on (Employe.idspecialite=specialite.idspecialite);
+select idemploye, Employe.nom, Employe.prenom, genre.nom as genre , specialite.nomspecialite 
+from Employe 
+join genre on (Employe.idgenre=genre.idgenre) 
+join specialite on (Employe.idspecialite=specialite.idspecialite);
 
-
-select * from liste_employe;
-
--- Liste vehicule
+-- liste_vehicule
 create or replace view liste_vehicule as
-select vc.idclient,c.nom,c.prenom,vc.immatriculation,mq.marque,m.modele from vehicule_client vc 
-join modele m on vc.idmodele=m.id 
-join marque mq on mq.id=m.idmarque 
-join vehicule v using(idvehicule) 
-join client c using(idclient);
-
-select * from liste_vehicule;
+select Client.idclient, Client.nom, Client.prenom , vehicule_client.immatriculation, Vehicule.typevehicule, modele.modele
+from vehicule_client
+join  Client on (vehicule_client.idclient =Client.idclient)
+join  Vehicule on (vehicule_client.idvehicule =Vehicule.idvehicule)
+join  modele on (vehicule_client.idmodele =modele.id);
+select   liste_vehicule.idclient, liste_vehicule.nom, liste_vehicule.prenom , liste_vehicule.immatriculation, liste_vehicule.typevehicule, liste_vehicule.modele, marque.marque
+from marque
+join  liste_vehicule on marque.id =liste_vehicule.idclient;
 
 -- liste_client
+create or replace view liste_client as
 select Client.idclient, Client.nom, Client.prenom, Client.contact
 from Client;
 
--- devis_service
-create or replace view devis_service as
-select tp.idtypeservice,tp.type_service,spc.nomspecialite,sp.dureetravail,spc.salaire_par_heure,(spc.salaire_par_heure*sp.dureetravail) as prix_salariale, tp.marge_beneficiaire from type_service tp 
-join Service_specialite sp using(idtypeservice) 
-join specialite spc using(idspecialite);
 
--- devis produit
-Create or replace view devis_produit as
-select p.idproduit,p.nomproduit,p.prix,s_p.quantite,tp.idtypeservice,tp.type_service,(p.prix*s_p.quantite) as prix_total_produit from produit p 
-join Service_produit s_p using(idproduit) 
-join type_service tp  using(idtypeservice); 
+-- les 5 clients les plus fideles
+create or replace view Nom as
+select Client.nom, count(Client.idclient)
+from Client 
+join  Achat_piece on (client.idclient=client.idclient)
+group by nom
+order by count desc
+limit 5;
 
+-- L'entretien qui se fait le plus dans le garage
+create or replace view nomspecialite as
+select nomspecialite,count(idspecialite)
+from specialite
+group by nomspecialite
+order by count desc
+limit 1;
 
--- Somme total du salaire_par_heure de chaque specialites utilisees pour effectuer le x service
-Create or replace view total_devis_service as
-select idtypeservice,sum(ds.prix_salariale) from devis_service ds group by idtypeservice;
-
-
--- Somme total du prix des produits utilisees pour effectuer le x service
-Create or replace view total_devis_produit as
-select idtypeservice,sum(ds.prix_total_produit) from devis_produit ds group by idtypeservice;
-
-
--- Calcul benefice;
--- Prix de vente d'un service - depenses utilisation de produit;
+-- Facture_mere_client
+create or replace view Facture_mere_client as
+select Client.idclient,facture_mere.idFactureMere,Client.nom,Client.prenom,facture_mere.dates
+from Client
+join facture_mere on (Client.idclient=facture_mere.idclient);
 
 
--- select tp.idtypeservice,tp.type_service,spc.nomspecialite,sp.dureetravail,spc.salaire_par_heure,(spc.salaire_par_heure*sp.dureetravail+tp.marge_beneficiaire) as prix_salariale from type_service tp 
--- join Service_specialite sp using(idtypeservice) 
--- join specialite spc using(idspecialite)
--- join service_client sc using(idtypeservice);
+-- Details_facture_client 
+create or replace view facture as
+select facture_mere.idFactureMere,Client.idclient,Client.nom,Client.prenom, dates
+from facture_mere
+join Client on (facture_mere.idclient=Client.idclient);
 
-create or replace view service as select service.idtypeservice, service.type_service, produit.sum as montant_produit, d_service.sum as montant_service, service.marge_beneficiaire
-from type_service service
-join total_devis_produit produit on service.idtypeservice = produit.idtypeservice 
-join total_devis_service d_service on service.idtypeservice = d_service.idtypeservice;
 
-create view facture as 
-select sc.idclient, sc.idtypeservice, ts.type_service as nom, sc.quantite, ((s.montant_produit + s.montant_service) + (s.montant_produit+s.montant_service)*s.marge_beneficiaire) as prix
-from service_client sc 
-join type_service ts on sc.idtypeservice=ts.idtypeservice
-join service s on sc.idtypeservice = s.idtypeservice
-group by sc.idclient, sc.idtypeservice, nom, sc.quantite, prix;
+create or replace view Details_facture_client as 
+select facture.idFactureMere,facture.idclient,facture.nom,facture.prenom,
+type_service.idtypeservice,type_service.type_service,details_Facture.Montant,details_Facture.prixunitaire,
+details_Facture.quantite
+from details_Facture
+join facture on (details_Facture.idFactureMere = facture.idFactureMere)
+join type_service on (details_Facture.idtypeservice=type_service.idtypeservice);
 
-Create table facture_client(
-    idFacture_client serial not null primary key,
-    idclient int not null references client(idclient),
-    montantapayer double precision
-);
 
-Create table paiement_facture(
-    idfacture int not null references facture_client(idFacture_client),
-    montantpaye double precision
-);
+
+
+
+
+
+
+
