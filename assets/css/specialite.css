@@ -1,0 +1,85 @@
+header
+{
+    margin-top: 30px;
+}
+#body{
+    font-family: Arial, Helvetica, sans-serif;
+    display: grid;
+    grid-template-columns: 40% 60%;  
+    height: 750px;
+    width: 750px;
+    margin-left: 350px;
+    margin-top: 30px;
+    background: linear-gradient(255deg, #fdfdffb3, #fdfcfc);
+}
+
+#nav
+{
+    background-color: blue;
+    display: inline;
+}
+table
+{
+    margin-top: 80px;
+    margin-left: 150px;
+}
+li
+{
+    list-style: none;
+    display: inline-flex;
+    padding-left: 80px;
+}
+
+
+#sary{
+    background-color: rgb(2, 56, 56);
+    background-position: center;
+    background-size: cover;
+    height: 505px;
+    margin-top: 60px;
+}
+#content{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 500px;
+    border: solid 2px rgb(2, 14, 56);
+    margin-top: 60px;
+}
+h2{
+    color: rgb(2, 14, 56);
+}
+form div{
+    margin-top: 30px;
+    display: grid;
+    grid-template-columns: 50% 50%;
+}
+input[type=text],select{
+    height: 25px;
+    width: 200px;
+}
+SPAN{
+    padding-top: 7PX;
+    font-size: small;
+}
+label{
+    padding-top: 7px;
+    font-weight: bold;
+}
+#submit{
+    display: grid;
+    grid-template-columns: 40% 40%;
+    grid-gap: 20%;
+    margin-left: 40px;
+    margin-top: 40px;
+}
+input[type=submit], button{
+    height: 40px;
+    width: 90px;
+    background-color: rgb(2, 14, 56);
+    border: none;
+    border-radius: 5px;
+    color: white;
+    font-size: small;
+}

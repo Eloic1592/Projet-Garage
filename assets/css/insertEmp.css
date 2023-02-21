@@ -1,0 +1,107 @@
+header
+{
+    /* margin-top: 30px; */
+    background-color: rgb(2, 56, 56);
+    height: 50px;
+}
+#nav
+{
+    background-color: blue;
+    display: inline;
+}
+table
+{
+    /* margin-top: 75px; */
+    margin-left: 150px;
+}
+li
+{
+    color: white;
+    margin-top: 15px;
+    list-style: none;
+    display: inline-flex;
+    padding-left: 80px;
+}
+a{
+    font-family: cursive;
+    color: white;
+    text-decoration: none;
+}
+#footer{
+    color: white;
+    background-color: rgb(2, 56, 56);
+    height: 40px;
+}
+
+#body{
+    font-family: Arial, Helvetica, sans-serif;
+    display: grid;
+    grid-template-columns: 40% 60%;  
+    height: 600px;
+    width: 750px;
+    margin-left: 350px;
+    margin-top: 50px;
+    background: linear-gradient(255deg, #fdfdffb3, #fdfcfc);
+}
+
+.link {
+    color: black;
+}
+
+#tete li{
+    display: inline-flex;
+    margin-left: 45px;
+}
+#sary{
+    background-color: rgb(2, 56, 56);
+    background-position: center;
+    background-size: cover;
+    height: 505px;
+}
+#content{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 500px;
+    border: solid 2px rgb(2, 14, 56);
+}
+h1{
+    color: rgb(2, 14, 56);
+}
+form div{
+    margin-top: 30px;
+    display: grid;
+    grid-template-columns: 50% 50%;
+}
+input[type=text],select{
+    height: 25px;
+    width: 200px;
+}
+SPAN{
+    padding-top: 7PX;
+    font-size: small;
+}
+#genre{
+    display: grid; 
+    grid-template-columns: 50% 1% 20% 1% 20%;
+}
+label{
+    padding-top: 7px;
+    font-weight: bold;
+}
+#submit{
+    display: grid;
+    grid-template-columns: 40% 40%;
+    grid-gap: 20%;
+    margin-left: 250px;
+}
+input[type=submit], button{
+    height: 40px;
+    width: 90px;
+    background-color: rgb(2, 14, 56);
+    border: none;
+    border-radius: 5px;
+    color: white;
+    font-size: small;
+}
