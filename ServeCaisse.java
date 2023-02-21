@@ -7,6 +7,7 @@
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.RequestDispatcher;
@@ -14,13 +15,18 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import model.Client;
+
+import model.Depense;
+import model.Facture;
+import model.Facture_mere;
+import model.Paiementfacture;
+import model.Report;
 
 /**
  *
  * @author Mialisoa
  */
-public class InsertClientServlet extends HttpServlet {
+public class ServeCaisse extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -35,32 +41,31 @@ public class InsertClientServlet extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         
-        String nom = request.getParameter("nom");
-        String prenom = request.getParameter("prenom");
-        String email = request.getParameter("email");
-        String contact = request.getParameter("contact");
-        String adresse = request.getParameter("adresse");
-        String dtn = request.getParameter("dtn");
-        
-        
-        Integer error = 0;
+        Float entree;
         try {
-            Client client = new Client(0, nom, prenom, email, contact, adresse, dtn);
-            client.insertToTable(null, true);
-            response.sendRedirect("ListeClient");
-        } catch (SQLException e) {
-            error = 1;                  //erreur lié à la bdd
-            e.printStackTrace(response.getWriter());
-        } catch (Exception ex) {
-            error = 2;                  // erreur d'exécution
-                        ex.printStackTrace(response.getWriter());
+            entree = Paiementfacture.somme(null, new Date());
+            Float sortie = Depense.somme(null, new Date());
+            Float reste = entree-sortie;
+            Double report =  new Report().getLastSomme(null);
+            RequestDispatcher dispatcher = request.getRequestDispatcher("caisse.jsp");
 
+            request.setAttribute("entree", entree);
+            request.setAttribute("sortie", sortie);
+            request.setAttribute("reste", reste);
+            request.setAttribute("report", report);
+
+
+            PrintWriter out = response.getWriter();
+            // out.print(entree + " " + sortie + " " + reste);
+
+            dispatcher.forward(request, response);
+        } catch (SQLException ex) {
+            Logger.getLogger(ServeCaisse.class.getName()).log(Level.SEVERE, null, ex);
+            ex.printStackTrace(response.getWriter());
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(ServeCaisse.class.getName()).log(Level.SEVERE, null, ex);
         }
-        finally {
-            request.setAttribute("error", error);
-            RequestDispatcher dispatch = request.getRequestDispatcher("insert-client.jsp");
-            //dispatch.forward(request, response);
-        }
+        
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

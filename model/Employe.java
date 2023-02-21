@@ -28,7 +28,7 @@ public class Employe extends Model {
     int idGenre;
     int idNiveauEtude;
    
-    public Employe(int id, String nom, String prenom, String dateNaissance, int idGenre, int idNiveauEtude) throws AgeException, ParseException {
+    public Employe(int id, String nom, String prenom, String dateNaissance, int idGenre, int idNiveauEtude) throws Exception {
         this.setIdEmploye(id);
         this.setNom(nom);
         this.setPrenom(prenom);
@@ -97,18 +97,13 @@ public class Employe extends Model {
         this.dateNaissance = dateNaissance;
     }
     
-    public void setdateNaissance(String dateNaissance) throws AgeException, ParseException{
+    public void setdateNaissance(String dateNaissance) throws ParseException, Exception{
         if(dateNaissance == null)
                this.dateNaissance = null;
         else {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
             Date d = dateFormat.parse(dateNaissance);
-            Date today = new Date();
-            
-            if(today.getYear() - d.getYear() < 18) {
-                throw new AgeException("Trop jeune pour ce travail");
-            }
-            this.dateNaissance = d;
+            this.setdateNaissance(d);
         }
     }
 

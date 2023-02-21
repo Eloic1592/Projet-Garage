@@ -95,6 +95,71 @@ public class Model {
         }
     }
 
+    public int insertReturning(Connection connection, boolean primaryKey, String column) throws SQLException, Exception {
+        boolean isOpen = false;
+        if (connection == null) {
+            connection = PostgresConnection.getConnection();
+            isOpen = true;
+        }
+
+        Statement statement = connection.createStatement();
+        String req = "insert into " + this.getClass().getSimpleName().toUpperCase() + " values (";
+        Field[] fields = this.getClass().getDeclaredFields();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+        int depart = 0;
+        if(primaryKey == true) {
+            depart = 1;
+            req += "default, ";
+        }
+        
+        for (int i = depart; i < this.getNbrField(); i++) {
+            // get the getter of each field
+            String getterName = "get" + fields[i].getName().replaceFirst(String.valueOf(fields[i].getName().charAt(0)),
+                    String.valueOf(fields[i].getName().toUpperCase().charAt(0)));
+           
+            Method getter = this.getClass().getDeclaredMethod(getterName);
+            if (fields[i].getType().isPrimitive() && !fields[i].getType().equals(boolean.class)) {
+                req += getter.invoke(this);
+            } else {
+                if (getter.invoke(this) == null) {
+                    req += "NULL";
+                } else {
+                    String value = fields[i].get(this).toString();
+                    value = getter.invoke(this).toString();
+
+                    if (fields[i].getType().equals(Date.class)) {
+                        value = dateFormat.format(fields[i].get(this));
+                    }
+
+                    req += "'" + value + "'";
+                }
+            }
+            if (i + 1 < this.getNbrField()) {
+                req += ",";
+            }
+        }
+        req += ") returning " + column;
+        int returning = 0;
+        try {
+            ResultSet response = statement.executeQuery(req);
+            if (response.next()) {
+               returning = response.getInt(1); 
+            }
+        } catch (SQLException e) {
+            connection.rollback();
+            throw e;
+        }
+
+        statement.close();
+        if (isOpen) {
+            connection.commit();
+            connection.close();
+        }
+
+        return returning;
+    }
+
     public Vector getAll(Connection connection) throws ClassNotFoundException, SQLException, Exception {
         // Cas précis pour ORACLE
         boolean isOpen = false;
@@ -184,7 +249,6 @@ public class Model {
             for (int i = 0; i < params.length; i++) {
                 getterName = "get" + params[i].replaceFirst(String.valueOf(params[i].charAt(0)), String.valueOf(params[i].toUpperCase().charAt(0)));
                 getter = this.getClass().getDeclaredMethod(getterName);
-
                 column = params[i];
                 attribut = getter.invoke(this);
                 if(attribut == null) {
@@ -204,6 +268,8 @@ public class Model {
                 if (i + 1 < params.length) {
                     req += " AND ";
                 }
+                System.out.println(getterName);
+
             }
         }
 

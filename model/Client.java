@@ -5,38 +5,48 @@
  */
 package model;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  *
  * @author Mialisoa
  */
 public class Client extends Model {
-    int idClient;
+    int idclient;
     String nom;
     String prenom;
     String email;
     String contact;
     String adresse;
-
-    public Client(int idClient, String nom, String prenom, String email, String contact, String adresse) {
-        this.setIdClient(idClient);
+    Date datenaissance;
+    
+    public Client(int idClient, String nom, String prenom, String email, String contact, String adresse, String dateNaissance) throws ParseException, Exception {
+        this.setIdclient(idClient);
         this.setNom(nom);
         this.setPrenom(prenom);
         this.setEmail(email);
         this.setContact(contact);
         this.setAdresse(adresse);
-        this.setNbrField(6);
+        this.setDatenaissance(dateNaissance);
+        this.setNbrField(7);
     }
 
     public Client() {
-        this.setNbrField(6);
+        this.setNbrField(7);
     }
 
-    public int getIdClient() {
-        return idClient;
+    public int getIdclient() {
+        return idclient;
     }
 
-    public void setIdClient(int idClient) {
-        this.idClient = idClient;
+    public void setIdclient(int idClient) {
+        this.idclient = idClient;
+    }
+
+    public void setIdclient(String idClient) {
+        this.setIdclient(Integer.parseInt(idClient));;
     }
 
     public String getNom() {
@@ -77,6 +87,25 @@ public class Client extends Model {
 
     public void setAdresse(String adresse) {
         this.adresse = adresse;
+    }
+
+    public Date getDatenaissance() {
+        return datenaissance;
+    }
+
+    public void setDatenaissance(Date dateNaissance) throws Exception {
+        Date today = new Date();
+        this.datenaissance = dateNaissance;
+    }
+    
+    public void setDatenaissance(String dateNaissance) throws ParseException, Exception{
+        if(dateNaissance == null)
+               this.datenaissance = null;
+        else {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            Date d = dateFormat.parse(dateNaissance);
+            this.setDatenaissance(d);
+        }
     }
 
 }

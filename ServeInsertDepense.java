@@ -7,20 +7,23 @@
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.RequestDispatcher;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import model.Client;
+
+import model.Type_depense;
 
 /**
  *
  * @author Mialisoa
  */
-public class InsertClientServlet extends HttpServlet {
+public class ServeInsertDepense extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -35,31 +38,20 @@ public class InsertClientServlet extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         
-        String nom = request.getParameter("nom");
-        String prenom = request.getParameter("prenom");
-        String email = request.getParameter("email");
-        String contact = request.getParameter("contact");
-        String adresse = request.getParameter("adresse");
-        String dtn = request.getParameter("dtn");
-        
-        
-        Integer error = 0;
+        Type_depense depense = new Type_depense();
+        Vector<Type_depense> types;
         try {
-            Client client = new Client(0, nom, prenom, email, contact, adresse, dtn);
-            client.insertToTable(null, true);
-            response.sendRedirect("ListeClient");
-        } catch (SQLException e) {
-            error = 1;                  //erreur lié à la bdd
-            e.printStackTrace(response.getWriter());
+            types = depense.getAll(null);
+            for (Type_depense type_depense : types) {
+                System.out.println(type_depense.getType_depense());
+            }
+            RequestDispatcher dispatcher = request.getRequestDispatcher("insert-depense.jsp");
+            request.setAttribute("types", types);
+            dispatcher.forward(request, response);
+        } catch (SQLException ex) {
+            Logger.getLogger(ServeInsertDepense.class.getName()).log(Level.SEVERE, null, ex);
         } catch (Exception ex) {
-            error = 2;                  // erreur d'exécution
-                        ex.printStackTrace(response.getWriter());
-
-        }
-        finally {
-            request.setAttribute("error", error);
-            RequestDispatcher dispatch = request.getRequestDispatcher("insert-client.jsp");
-            //dispatch.forward(request, response);
+            Logger.getLogger(ServeInsertDepense.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

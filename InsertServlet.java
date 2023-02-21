@@ -56,7 +56,6 @@ public class InsertServlet extends HttpServlet {
             out.print(id.intValue());
             connection.commit();
             
-            
             request.getSession().setAttribute("id", id);              
             dispatch = request.getRequestDispatcher("specialite.jsp");
             dispatch.forward(request, response);

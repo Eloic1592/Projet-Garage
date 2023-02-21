@@ -6,21 +6,28 @@
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.sql.Timestamp;
+import java.util.Vector;
 import javax.servlet.RequestDispatcher;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import connection.PostgresConnection;
 import model.Client;
+import model.Details_facture_client;
+import model.Facture_mere;
+import model.Remise;
 
 /**
  *
  * @author Mialisoa
  */
-public class InsertClientServlet extends HttpServlet {
+public class ServeDetailsFacture extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -35,32 +42,57 @@ public class InsertClientServlet extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         
-        String nom = request.getParameter("nom");
-        String prenom = request.getParameter("prenom");
-        String email = request.getParameter("email");
-        String contact = request.getParameter("contact");
-        String adresse = request.getParameter("adresse");
-        String dtn = request.getParameter("dtn");
-        
-        
-        Integer error = 0;
+        RequestDispatcher dispatcher = request.getRequestDispatcher("details_facture.jsp");
         try {
-            Client client = new Client(0, nom, prenom, email, contact, adresse, dtn);
-            client.insertToTable(null, true);
-            response.sendRedirect("ListeClient");
+            Connection connection = PostgresConnection.getConnection();
+            Details_facture_client details = new Details_facture_client();
+            details.setIdfacturemere(request.getParameter("idfacture"));
+            String[] params = new String[1];
+            params[0] = "idfacturemere";
+
+            Facture_mere factureMere = new Facture_mere();
+            factureMere.setIdfacturemere(request.getParameter("idfacture"));
+            Vector<Details_facture_client> factures = factureMere.getDetailsFactureClient(connection);
+
+            Facture_mere f = (Facture_mere)factureMere.getBy(connection, params).get(0);
+            
+            // Timestamp temps = f.getDates();
+            // int jour = temps.getDay();
+            // int mois = temps.getMonth();
+
+            // Client c = new Client();
+            // c.setIdclient(f.getIdclient());
+            // params[0] = "idclient";
+
+            // Client client = ((Client)c.getBy(connection, params).get(0));
+            // Double total = Details_facture_client.getTotal(factures);    
+
+            // if(jour == client.getDatenaissance().getDay() && mois == client.getDatenaissance().getMonth()) {
+            //     total = total/2;
+            // }
+
+            Double reste = factureMere.getResteAPayer(connection);
+            String remise = f.parseRemise();
+            request.setAttribute("factures", factures);
+            request.setAttribute("reste", reste);
+            request.setAttribute("remise", remise); 
+
+            connection.close();
         } catch (SQLException e) {
-            error = 1;                  //erreur lié à la bdd
+            Integer sqlError = 1;
+            request.setAttribute("sqlError", sqlError);
+            response.getWriter().print("sql");
             e.printStackTrace(response.getWriter());
-        } catch (Exception ex) {
-            error = 2;                  // erreur d'exécution
-                        ex.printStackTrace(response.getWriter());
+        } catch (Exception e1) {
+            Integer error = 1;
+            request.setAttribute("error", error);
+            response.getWriter().print("error\n");
+            e1.printStackTrace(response.getWriter());
 
         }
         finally {
-            request.setAttribute("error", error);
-            RequestDispatcher dispatch = request.getRequestDispatcher("insert-client.jsp");
-            //dispatch.forward(request, response);
-        }
+            dispatcher.forward(request, response);
+        } 
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

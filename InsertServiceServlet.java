@@ -44,7 +44,7 @@ public class InsertServiceServlet extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         
-        int idVehicule = Integer.parseInt(request.getParameter("vehicule"));
+        /*int idVehicule = Integer.parseInt(request.getParameter("vehicule"));
         int idClient = Integer.parseInt(request.getParameter("client"));
         int idTypeService = Integer.parseInt(request.getParameter("service"));
         String libelle = request.getParameter("libelle");
@@ -117,7 +117,7 @@ public class InsertServiceServlet extends HttpServlet {
                     request.setAttribute("service_client", service_client);
                 }
                 dispatcher.forward(request, response);
-            }
+            }*/
         // }
 
     }

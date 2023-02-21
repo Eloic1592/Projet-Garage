@@ -14,7 +14,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import exceptions.AuthException;
 import javax.servlet.http.HttpSession;
 import model.Garagiste;
 
@@ -42,16 +41,17 @@ public class LoginGaragiste extends HttpServlet {
 
         Garagiste garagiste = new Garagiste(0, email, mdp);
         try {
-            int id = garagiste.authentification(null);
+            Garagiste auth = garagiste.authentification(null);
             HttpSession session = request.getSession();
-            session.setAttribute("garagiste", id);
-            response.sendRedirect("ListeEmploye");
-        } catch (SQLException e) {
-            // Erreur de base de donnée
-        } catch (AuthException e) {
-            // login incorrect
-        } catch (Exception e) {
-            // internal servor error
+            if(auth != null) {
+                session.setAttribute("garagiste", auth.getIdgaragiste());
+                response.sendRedirect("ListeEmploye");
+            }
+            // response.sendRedirect(); page login
+        } catch (SQLException e1) {
+            request.setAttribute("sqlError", 1);
+        } catch (Exception e2) {
+            request.setAttribute("error", 1);
         }
         
     }

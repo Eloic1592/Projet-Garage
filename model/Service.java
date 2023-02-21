@@ -30,6 +30,10 @@ public class Service extends Model {
     public Service() {
         setNbrField(5);
     }
+    
+    public double getPrixDeVente() {
+        return (getMontant_produit()+getMontant_service())+(getMontant_produit()+getMontant_service())*getMarge_beneficiaire();
+    }
 
     public double getBenefice() {
         return (this.getMontant_produit() + this.getMontant_service())*this.getMarge_beneficiaire();

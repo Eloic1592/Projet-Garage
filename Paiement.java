@@ -4,6 +4,7 @@
  * and open the template in the editor.
  */
 
+import exceptions.DataException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
@@ -14,13 +15,14 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import model.Client;
+
+import model.Facture_mere;
 
 /**
  *
  * @author Mialisoa
  */
-public class InsertClientServlet extends HttpServlet {
+public class Paiement extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -35,31 +37,31 @@ public class InsertClientServlet extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         
-        String nom = request.getParameter("nom");
-        String prenom = request.getParameter("prenom");
-        String email = request.getParameter("email");
-        String contact = request.getParameter("contact");
-        String adresse = request.getParameter("adresse");
-        String dtn = request.getParameter("dtn");
+        String montant = request.getParameter("montant");
+        String idclient = request.getParameter("idclient");
+        String idfacture = request.getParameter("idfacture");
+        String date = request.getParameter("date");
+        Facture_mere facture = new Facture_mere();
+        facture.setIdfacturemere(idfacture);
+        facture.setIdclient(idclient);
         
-        
-        Integer error = 0;
-        try {
-            Client client = new Client(0, nom, prenom, email, contact, adresse, dtn);
-            client.insertToTable(null, true);
-            response.sendRedirect("ListeClient");
-        } catch (SQLException e) {
-            error = 1;                  //erreur lié à la bdd
-            e.printStackTrace(response.getWriter());
+        RequestDispatcher dispatcher = request.getRequestDispatcher("ServeDetailsFacture?idfacture=" + idfacture + "&&idclient=" + idclient);
+        int error = 0;
+        try {        
+            facture.payer(null, montant, date);
+        } catch (SQLException ex) {
+            error = 1;
+        } catch (DataException ex) {
+            error = 5;
         } catch (Exception ex) {
-            error = 2;                  // erreur d'exécution
-                        ex.printStackTrace(response.getWriter());
-
+            error = 10;
         }
         finally {
-            request.setAttribute("error", error);
-            RequestDispatcher dispatch = request.getRequestDispatcher("insert-client.jsp");
-            //dispatch.forward(request, response);
+            String location = "ServeDetailsFacture?idfacture=" + idfacture + "&&idclient=" + idclient;
+            if(error != 0) {
+                location += "&&error="+error;
+            }
+            response.sendRedirect(location);
         }
     }
 
@@ -76,6 +78,7 @@ public class InsertClientServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         processRequest(request, response);
+
     }
 
     /**

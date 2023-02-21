@@ -7,20 +7,21 @@
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Vector;
 import javax.servlet.RequestDispatcher;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import model.Client;
+
+import model.Service_client;
 
 /**
  *
  * @author Mialisoa
  */
-public class InsertClientServlet extends HttpServlet {
+public class ServeServiceClient extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -35,31 +36,19 @@ public class InsertClientServlet extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         
-        String nom = request.getParameter("nom");
-        String prenom = request.getParameter("prenom");
-        String email = request.getParameter("email");
-        String contact = request.getParameter("contact");
-        String adresse = request.getParameter("adresse");
-        String dtn = request.getParameter("dtn");
-        
-        
-        Integer error = 0;
+        RequestDispatcher dispatcher = request.getRequestDispatcher("form-produit.jsp");
         try {
-            Client client = new Client(0, nom, prenom, email, contact, adresse, dtn);
-            client.insertToTable(null, true);
-            response.sendRedirect("ListeClient");
-        } catch (SQLException e) {
-            error = 1;                  //erreur lié à la bdd
-            e.printStackTrace(response.getWriter());
-        } catch (Exception ex) {
-            error = 2;                  // erreur d'exécution
-                        ex.printStackTrace(response.getWriter());
-
+            int id = Integer.parseInt(request.getParameter("idclient"));
+            //Service_client() serviceClient = new Serv
+            //Vector<Service_client> services = new Service_client().getAll(null);
+            
+            //request.setAttribute("services", services);
+        } catch (Exception e1) {
+            Integer error = 1;
+            request.setAttribute("error", error);
         }
         finally {
-            request.setAttribute("error", error);
-            RequestDispatcher dispatch = request.getRequestDispatcher("insert-client.jsp");
-            //dispatch.forward(request, response);
+            dispatcher.forward(request, response);
         }
     }
 

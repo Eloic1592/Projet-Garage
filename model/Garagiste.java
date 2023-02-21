@@ -10,7 +10,6 @@ import java.sql.SQLException;
 import java.util.Vector;
 
 import connection.PostgresConnection;
-import exceptions.AuthException;
 
 /**
  *
@@ -33,7 +32,7 @@ public class Garagiste extends Model {
         this.setNbrField(3);
     }
 
-    public int authentification(Connection connection) throws ClassNotFoundException, SQLException, AuthException, Exception {
+    public Garagiste authentification(Connection connection) throws ClassNotFoundException, SQLException, Exception {
         boolean isOpen = false;
         if (connection == null) {
             connection = PostgresConnection.getConnection();
@@ -49,10 +48,10 @@ public class Garagiste extends Model {
             connection.close();
         }
         if(auth.size() == 1) {
-            return auth.get(0).getIdgaragiste();
+            return auth.get(0);
         }
         else {
-            throw new AuthException("Identifiants incorrects"); 
+            return null; 
         }
 
     }
